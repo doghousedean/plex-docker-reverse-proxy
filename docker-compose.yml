@@ -1,0 +1,176 @@
+version: '3'
+services:
+  deluge:
+    container_name: deluge
+    environment: [PUID=1000, PGID=1000, UMAST_SET=<022>]
+    hostname: deluge
+    image: linuxserver/deluge
+    ports:
+      - ${DELUGE_PORT}:8112
+    restart: always
+    volumes:
+      - type: bind
+        source: ${STORAGE_ROOT}/downloads
+        target: /downloads
+      - type: bind
+        source: ${STORAGE_ROOT}/deluge/config
+        target: /config
+      - type: bind 
+        source: ${STORAGE_ROOT}/scripts
+        target: /scripts
+      - type: bind
+        source: ${STORAGE_ROOT}/data/TV
+	target: /tv
+      - type: bind
+        source: ${STORAGE_ROOT}/data/movies
+	target: /movies
+      - type: bind
+        source: ${STORAGE_ROOT}/data/4k
+	target: /4k
+      - type: bind
+        source: ${STORAGE_ROOT}/data/learning
+	target: /learning
+      - type: bind
+        source: ${STORAGE_ROOT}/completed
+	target: /completed
+  plex:
+    container_name: plex
+    environment: [TZ="europe/london"]
+    hostname: plex
+    image: plexinc/pms-docker
+    ports: 
+      - ${PLEX_PORT}:32400
+    restart: always
+    volumes: 
+      - type: bind
+	source: ${STORAGE_ROOT}/plex/config
+	target: /config
+      - type: bind
+	source: ${STORAGE_ROOT}/plex/transcode/temp
+	target: /transcode
+      - type: bind
+	source: ${STORAGE_ROOT}/data/movies
+	target: /movies
+      - type: bind
+	source: ${STORAGE_ROOT}/data/TV
+	target: /TV
+      - type: bind
+	source: ${STORAGE_ROOT}/data/4k
+	target: /4k
+      - type: bind
+	source: ${STORAGE_ROOT}/data/3d
+	target: /3d
+      - type: bind
+	source: ${STORAGE_ROOT}/data/music
+	target: /music
+      - type: bind
+	source: ${STORAGE_ROOT}/data/podcasts
+	target: /podcasts
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    ports: 
+      - ${PORTAINER_PORT1}:9000
+      - ${PORTAINER_PORT2}:8000
+    restart: always
+    volumes: 
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - type: bind
+        source: ${STORAGE_ROOT}/portainer/data
+        target: /data
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    environment: [PUID=1000, PGID=1000, TZ=Europe/London, UMASK_SET=022]
+    volumes: 
+      - type: bind
+	source: ${STORAGE_ROOT}/sonarr
+	target: /config
+      - type: bind
+	source: ${STORAGE_ROOT}/data/TV
+	target: /tv
+      - type: bind
+	source: ${STORAGE_ROOT}/downloads
+	target: /downloads
+    ports: 
+      - ${SONARR_PORT}:8989
+    restart: unless-stopped
+  reverse:
+    container_name: reverse
+    hostname: reverse
+    restart: always
+    image: nginx
+    ports: 
+      - ${NGINX_HTTP_PORT}:80
+      - ${NGINX_HTTPS_PORT}:443
+    volumes: 
+      - type: bind
+	source: ${STORAGE_ROOT}/nginx-rp/config
+	target: /etc/nginx
+      - type: bind
+	source: ${STORAGE_ROOT}/nginx-rp/ssl
+	target: /etc/ssl/private
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - AUTO_UPDATE=true #optional RUN_OPTS=<run options here> #optional
+    volumes:
+      - type: bind
+	source: ${STORAGE_ROOT}/jackett
+	target: /config
+      - type: bind
+	source: ${STORAGE_ROOT}/downloads
+	target: /downloads
+    ports:
+      - ${JACKETT_PORT}:9117
+    restart: unless-stopped
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    environment: [PUID=1000, PGUID=1000, TZ=Europe/London, URL=pms.ag33k.net, SUBDOMAINS=wildcard, VALIDATION=http, DHLEVEL=4096]
+    volumes: 
+      - type: bind
+	source: ${STORAGE_ROOT}/letsencrypt/config
+	target: /config
+    restart: unless-stopped
+  tautilli:
+    container_name: tautulli
+    environment: [PUID=1000, PGID=1000, TZ=Europe/London]
+    hostname: tautulli
+    image: tautulli/tautulli
+    ports: 
+      - ${TAUTILLI_PORT}:8181']
+    restart: always
+    volumes: 
+      - type: bind
+	source: ${STORAGE_ROOT}/plex/config/Library/Application Support/Plex Media Server/Logs
+	target: /plex_logs:ro
+      - type: bind
+	source: ${STORAGE_ROOT}/tautilli
+	target: /config
+  watchtower:
+    command: --cleanup portainer-app portainer-watchtower portainer/templates
+    container_name: portainer-watchtower
+    image: v2tec/watchtower
+    restart: always
+    volumes: ['/var/run/docker.sock:/var/run/docker.sock']
+  web:
+    container_name: web
+    image: nginx:latest
+    restart: always
+    ports: 
+      - ${WEBGUI_PORT}:80
+    volumes: 
+      - ${WEBGUI_ROOT}:/code
+      - './site.conf:/etc/nginx/conf.d/default.conf'
+  php:
+    container_name: php
+    image: php:fpm
+    restart: always
+    volumes: 
+      - ${WEBGUI_ROOT}/html/:/code
+      - './log.conf:/usr/local/etc/php-fpm.d/zz-log.conf'
