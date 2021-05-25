@@ -21,7 +21,10 @@ $(FQDN) = Your domain, eg: example.com
 Currently environment variables on NGIX config dont work, manually change $FQDN in the /nginx-rp/config/conf.d/sites-available/* files to your domain eg. example.com
 You can then access each service with plex.example.com if you have a wildcard A record for example.com
 
+I also get the feeling I'm missing something
+
 TASKS:
 
 - [x] Environment variables for docker-compose
 - [ ] NGINX Environment variables
+- [ ] Explain iptables - [light reading](https://unrouted.io/2017/08/15/docker-firewall/) available here
