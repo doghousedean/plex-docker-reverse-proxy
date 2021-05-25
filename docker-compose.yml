@@ -20,19 +20,19 @@ services:
         target: /scripts
       - type: bind
         source: ${STORAGE_ROOT}/data/TV
-	target: /tv
+        target: /tv
       - type: bind
         source: ${STORAGE_ROOT}/data/movies
-	target: /movies
+        target: /movies
       - type: bind
         source: ${STORAGE_ROOT}/data/4k
-	target: /4k
+        target: /4k
       - type: bind
         source: ${STORAGE_ROOT}/data/learning
-	target: /learning
+        target: /learning
       - type: bind
         source: ${STORAGE_ROOT}/completed
-	target: /completed
+        target: /completed
   plex:
     container_name: plex
     environment: [TZ="europe/london"]
@@ -43,29 +43,29 @@ services:
     restart: always
     volumes: 
       - type: bind
-	source: ${STORAGE_ROOT}/plex/config
-	target: /config
+        source: ${STORAGE_ROOT}/plex/config
+        target: /config
       - type: bind
-	source: ${STORAGE_ROOT}/plex/transcode/temp
-	target: /transcode
+        source: ${STORAGE_ROOT}/plex/transcode/temp
+        target: /transcode
       - type: bind
-	source: ${STORAGE_ROOT}/data/movies
-	target: /movies
+        source: ${STORAGE_ROOT}/data/movies
+        target: /movies
       - type: bind
-	source: ${STORAGE_ROOT}/data/TV
-	target: /TV
+        source: ${STORAGE_ROOT}/data/TV
+        target: /TV
       - type: bind
-	source: ${STORAGE_ROOT}/data/4k
-	target: /4k
+        source: ${STORAGE_ROOT}/data/4k
+        target: /4k
       - type: bind
-	source: ${STORAGE_ROOT}/data/3d
-	target: /3d
+        source: ${STORAGE_ROOT}/data/3d
+        target: /3d
       - type: bind
-	source: ${STORAGE_ROOT}/data/music
-	target: /music
+        source: ${STORAGE_ROOT}/data/music
+        target: /music
       - type: bind
-	source: ${STORAGE_ROOT}/data/podcasts
-	target: /podcasts
+        source: ${STORAGE_ROOT}/data/podcasts
+        target: /podcasts
   portainer:
     container_name: portainer
     image: portainer/portainer-ce
@@ -84,14 +84,14 @@ services:
     environment: [PUID=1000, PGID=1000, TZ=Europe/London, UMASK_SET=022]
     volumes: 
       - type: bind
-	source: ${STORAGE_ROOT}/sonarr
-	target: /config
+        source: ${STORAGE_ROOT}/sonarr
+        target: /config
       - type: bind
-	source: ${STORAGE_ROOT}/data/TV
-	target: /tv
+        source: ${STORAGE_ROOT}/data/TV
+        target: /tv
       - type: bind
-	source: ${STORAGE_ROOT}/downloads
-	target: /downloads
+        source: ${STORAGE_ROOT}/downloads
+        target: /downloads
     ports: 
       - ${SONARR_PORT}:8989
     restart: unless-stopped
@@ -105,11 +105,11 @@ services:
       - ${NGINX_HTTPS_PORT}:443
     volumes: 
       - type: bind
-	source: ${STORAGE_ROOT}/nginx-rp/config
-	target: /etc/nginx
+        source: ${STORAGE_ROOT}/nginx-rp/config
+        target: /etc/nginx
       - type: bind
-	source: ${STORAGE_ROOT}/nginx-rp/ssl
-	target: /etc/ssl/private
+        source: ${STORAGE_ROOT}/nginx-rp/ssl
+        target: /etc/ssl/private
   jackett:
     image: linuxserver/jackett
     container_name: jackett
@@ -120,11 +120,11 @@ services:
       - AUTO_UPDATE=true #optional RUN_OPTS=<run options here> #optional
     volumes:
       - type: bind
-	source: ${STORAGE_ROOT}/jackett
-	target: /config
+        source: ${STORAGE_ROOT}/jackett
+        target: /config
       - type: bind
-	source: ${STORAGE_ROOT}/downloads
-	target: /downloads
+        source: ${STORAGE_ROOT}/downloads
+        target: /downloads
     ports:
       - ${JACKETT_PORT}:9117
     restart: unless-stopped
@@ -134,8 +134,8 @@ services:
     environment: [PUID=1000, PGUID=1000, TZ=Europe/London, URL=pms.ag33k.net, SUBDOMAINS=wildcard, VALIDATION=http, DHLEVEL=4096]
     volumes: 
       - type: bind
-	source: ${STORAGE_ROOT}/letsencrypt/config
-	target: /config
+        source: ${STORAGE_ROOT}/letsencrypt/config
+        target: /config
     restart: unless-stopped
   tautilli:
     container_name: tautulli
@@ -143,15 +143,15 @@ services:
     hostname: tautulli
     image: tautulli/tautulli
     ports: 
-      - ${TAUTILLI_PORT}:8181']
+      - ${TAUTILLI_PORT}:8181
     restart: always
     volumes: 
       - type: bind
-	source: ${STORAGE_ROOT}/plex/config/Library/Application Support/Plex Media Server/Logs
-	target: /plex_logs:ro
+        source: ${STORAGE_ROOT}/plex/config/Library/Application Support/Plex Media Server/Logs
+        target: /plex_logs:ro
       - type: bind
-	source: ${STORAGE_ROOT}/tautilli
-	target: /config
+        source: ${STORAGE_ROOT}/tautilli
+        target: /config
   watchtower:
     command: --cleanup portainer-app portainer-watchtower portainer/templates
     container_name: portainer-watchtower
